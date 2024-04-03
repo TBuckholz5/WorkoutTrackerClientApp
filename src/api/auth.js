@@ -1,12 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-
-const baseUrl = 'http://10.0.0.197:5001';
-
-const jsonHeaders = {
-    'Content-Type': 'application/json',
-    'accept': 'application/json',
-};
+import { BASE_URL, JSON_HEADERS, getAuthHeader } from './constants';
 
 
 const storeTokensFromResponseData = async (data) => {
@@ -18,7 +12,7 @@ const storeTokensFromResponseData = async (data) => {
 
 export const login = async (email, password) => {
     try {
-        let response = await axios.post(url = `${baseUrl}/login`, data = {
+        let response = await axios.post(url = `${BASE_URL}/login`, data = {
             'email': email,
             'password': password,
             'twoFactorCode': '',
@@ -28,7 +22,7 @@ export const login = async (email, password) => {
                 useCookies: false,
                 useSessionCookies: false,
             },
-            headers: jsonHeaders,
+            headers: JSON_HEADERS,
         });
         storeTokensFromResponseData(response.data);
     } catch (err) {
@@ -37,13 +31,11 @@ export const login = async (email, password) => {
 }
 
 export const logout = async () => {
-    let token = await SecureStore.getItemAsync('token');
+    let header = await getAuthHeader();
     try {
-        await axios.post(url = `${baseUrl}/logout`, data = {
+        await axios.post(url = `${BASE_URL}/logout`, data = {
         }, config = {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
+            headers: { ...header, 'withCredentials': true },
         });
     } catch (err) {
         throw err;
@@ -52,11 +44,11 @@ export const logout = async () => {
 
 export const register = async (email, password) => {
     try {
-        let response = await axios.post(url = `${baseUrl}/register`, data = {
+        let response = await axios.post(url = `${BASE_URL}/register`, data = {
             'email': email,
             'password': password,
         }, config = {
-            headers: jsonHeaders,
+            headers: JSON_HEADERS,
         });
         console.log(response);
     } catch (err) {

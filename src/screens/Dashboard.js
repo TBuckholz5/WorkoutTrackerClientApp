@@ -1,12 +1,27 @@
 import React from 'react'
+import {
+  SafeAreaView,
+  FlatList,
+  StyleSheet,
+  StatusBar,
+} from 'react-native';
 import Background from '../components/Background'
 import Logo from '../components/Logo'
-import Header from '../components/Header'
-import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
 import { logout } from '../api/auth'
+import { getWorkoutsForUser } from '../api/workout_api';
+import { createWorkoutListElementFromJSON } from '../components/WorkoutListElement';
 
 export default function Dashboard({ navigation }) {
+  const [workouts, setWorkouts] = React.useState([]);
+
+  React.useEffect(() => {
+    getWorkoutsForUser().then((response) => {
+      setWorkouts(response);
+    }).catch((err) => {
+      console.log(err);
+    });
+  }, []);
 
   const onLogoutPressed = async () => {
     logout().then((_) => {
@@ -22,11 +37,13 @@ export default function Dashboard({ navigation }) {
   return (
     <Background>
       <Logo />
-      <Header>Let’s start</Header>
-      <Paragraph>
-        Your amazing app starts here. Open you favorite code editor and start
-        editing this project.
-      </Paragraph>
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          data={workouts}
+          renderItem={({item}) => createWorkoutListElementFromJSON(item)}
+          keyExtractor={item => item.id}
+        />
+      </SafeAreaView>
       <Button
         mode="outlined"
         onPress={onLogoutPressed}
@@ -36,3 +53,10 @@ export default function Dashboard({ navigation }) {
     </Background>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight || 0,
+  },
+});
