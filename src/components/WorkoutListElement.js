@@ -8,7 +8,7 @@ import { Card } from 'react-native-elements';
 export const createWorkoutListElementFromJSON = (data) => {
     return (
         <WorkoutListElement
-            date={data.date}
+            date={new Date(data.date).toString()}
             exercises={data.exercises}
         />
     );
