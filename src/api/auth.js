@@ -4,8 +4,6 @@ import { BASE_URL, JSON_HEADERS, getAuthHeader } from './constants';
 
 
 const storeTokensFromResponseData = async (data) => {
-    console.log(`Token: ${data.accessToken}`)
-    console.log(`Refresh Token: ${data.refreshToken}`)
     await SecureStore.setItemAsync('token', data.accessToken);
     await SecureStore.setItemAsync('refresh_token', data.refreshToken);
 }
@@ -50,7 +48,6 @@ export const register = async (email, password) => {
         }, config = {
             headers: JSON_HEADERS,
         });
-        console.log(response);
     } catch (err) {
         throw err;
     }
