@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~3.1.3",
     "@react-native-masked-view/masked-view": "0.3.0",
+    "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/stack": "^6.3.29",
     "@rneui/base": "github:react-native-elements/react-native-elements#base",
     "@rneui/themed": "^4.0.0-rc.8",

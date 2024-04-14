@@ -1,65 +1,100 @@
 import * as React from 'react';
-import * as WebBrowser from 'expo-web-browser';
-import {
-  exchangeCodeAsync,
-  makeRedirectUri,
-  useAuthRequest,
-  useAutoDiscovery,
-} from 'expo-auth-session';
-import { Button, Text, SafeAreaView } from 'react-native';
+import { Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import WorkoutHistory from './WorkoutHistory';
+import ExerciseList from './ExerciseList';
+import Button from '../components/Button';
+import { logout } from '../api/auth';
 
-WebBrowser.maybeCompleteAuthSession();
 
-export default function App() {
-  // Endpoint
-  const discovery = useAutoDiscovery(
-    'https://login.microsoftonline.com/<TENANT_ID>/v2.0',
-  );
-  const redirectUri = makeRedirectUri({
-    scheme: undefined,
-    path: 'auth',
-  });
-  const clientId = '<CLIENT_ID>';
+const Tab = createBottomTabNavigator();
 
-  // We store the JWT in here
-  const [token, setToken] = React.useState<string | null>(null);
+export default function Home({ navigation }) {
 
-  // Request
-  const [request, , promptAsync] = useAuthRequest(
-    {
-      clientId,
-      scopes: ['openid', 'profile', 'email', 'offline_access'],
-      redirectUri,
-    },
-    discovery,
-  );
+  const onLogoutPressed = async () => {
+    logout().then((_) => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'StartScreen' }],
+      })
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  function Settings() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Settings</Text>
+        <Button
+          mode="outlined"
+          onPress={onLogoutPressed}
+        >
+          Logout
+        </Button>
+      </View>
+    );
+  }
+
+  function StartWorkout() {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>TODO create workout flow!</Text>
+      </View>
+    );
+  }
 
   return (
-    <SafeAreaView>
-      <Button
-        disabled={!request}
-        title="Login"
-        onPress={() => {
-          promptAsync().then((codeResponse) => {
-            if (request && codeResponse?.type === 'success' && discovery) {
-              exchangeCodeAsync(
-                {
-                  clientId,
-                  code: codeResponse.params.code,
-                  extraParams: request.codeVerifier
-                    ? { code_verifier: request.codeVerifier }
-                    : undefined,
-                  redirectUri,
-                },
-                discovery,
-              ).then((res) => {
-                setToken(res.accessToken);
-              });
-            }
-          });
+    <NavigationContainer independent={true}>
+      <Tab.Navigator
+        initialRouteName="Start Workout"
+        screenOptions={{
+          tabBarActiveTintColor: '#e91e63',
         }}
-      />
-      <Text>{token}</Text>
-    </SafeAreaView>
+      >
+        <Tab.Screen
+          name="Start Workout"
+          component={StartWorkout}
+          options={{
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="home" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="History"
+          component={WorkoutHistory}
+          options={{
+            tabBarLabel: 'History',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="history" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Exercises"
+          component={ExerciseList}
+          options={{
+            tabBarLabel: 'Exercises',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="human" color={color} size={size} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            tabBarLabel: 'Settings',
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="account-cog" color={color} size={size} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }

@@ -7,12 +7,10 @@ import {
 } from 'react-native';
 import Background from '../components/Background'
 import Logo from '../components/Logo'
-import Button from '../components/Button'
-import { logout } from '../api/auth'
 import { getWorkoutsForUser } from '../api/workout_api';
 import { createWorkoutListElementFromJSON } from '../components/WorkoutListElement';
 
-export default function Dashboard({ navigation }) {
+export default function WorkoutHistory() {
   const [workouts, setWorkouts] = React.useState([]);
 
   React.useEffect(() => {
@@ -22,17 +20,6 @@ export default function Dashboard({ navigation }) {
       console.log(err);
     });
   }, []);
-
-  const onLogoutPressed = async () => {
-    logout().then((_) => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'StartScreen' }],
-      })
-    }).catch((err) => {
-      console.log(err);
-    });
-  }
 
   return (
     <Background>
@@ -44,12 +31,6 @@ export default function Dashboard({ navigation }) {
           keyExtractor={item => item.id}
         />
       </SafeAreaView>
-      <Button
-        mode="outlined"
-        onPress={onLogoutPressed}
-      >
-        Logout
-      </Button>
     </Background>
   )
 }

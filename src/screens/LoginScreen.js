@@ -27,7 +27,7 @@ export default function LoginScreen({ navigation }) {
     login(email.value, password.value).then((_) => {
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Dashboard' }],
+        routes: [{ name: 'Home' }],
       })
     }).catch((err) => {
       console.log(err);

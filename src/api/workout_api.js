@@ -12,3 +12,14 @@ export const getWorkoutsForUser = async () => {
         throw err;
     }
 }
+
+export const getExercisesForUser = async () => {
+    let header = await getAuthHeader();
+    try {
+        return (await axios.get(url = `${BASE_URL}/api/ExerciseTypes`, config = {
+            headers: header,
+        })).data;
+    } catch (err) {
+        throw err;
+    }
+}
