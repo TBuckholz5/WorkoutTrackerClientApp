@@ -7,14 +7,14 @@ import {
 } from 'react-native';
 import Background from '../components/Background'
 import Logo from '../components/Logo'
-import { getWorkoutsForUser } from '../api/workout_api';
+import { getWorkouts } from '../api/workout_api';
 import { createWorkoutListElementFromJSON } from '../components/WorkoutListElement';
 
 export default function WorkoutHistory() {
   const [workouts, setWorkouts] = React.useState([]);
 
   React.useEffect(() => {
-    getWorkoutsForUser().then((response) => {
+    getWorkouts().then((response) => {
       setWorkouts(response);
     }).catch((err) => {
       console.log(err);

@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import WorkoutHistory from './WorkoutHistory';
-import ExerciseList from './ExerciseList';
+import ExerciseListScreen from './ExerciseListScreen';
 import Button from '../components/Button';
 import { logout } from '../api/auth';
 
@@ -76,13 +76,13 @@ export default function Home({ navigation }) {
         />
         <Tab.Screen
           name="Exercises"
-          component={ExerciseList}
-          options={{
+          component={ExerciseListScreen}
+          options={({ navigation, route }) => ({
             tabBarLabel: 'Exercises',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="human" color={color} size={size} />
             ),
-          }}
+          })}
         />
         <Tab.Screen
           name="Settings"
