@@ -5,16 +5,23 @@ import {
   StyleSheet,
   StatusBar,
   View,
-  Text
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import Button from '../components/Button';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
-import { getExercises, createExercise } from '../api/workout_api';
+import { getExercises, createExercise, deleteExercise } from '../api/workout_api';
 import { createExerciseListElementFromJSON } from '../components/ExerciseListElement';
 import { Modal } from 'react-native-paper';
 import TextInput from '../components/TextInput';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  MenuProvider,
+  Menu,
+  MenuTrigger,
+  MenuOptions
+} from 'react-native-popup-menu';
 
 export default function ExerciseListScreen({ navigation }) {
   const [addExerciseModalVisible, setAddExerciseModalVisible] = React.useState(false);
@@ -25,9 +32,9 @@ export default function ExerciseListScreen({ navigation }) {
     navigation.setOptions({
       headerLeft: () => (
         <MaterialCommunityIcons.Button
-          name="plus"
-          backgroundColor="#ffffff"
-          color="#000000"
+          name='plus'
+          backgroundColor='#ffffff'
+          color='#000000'
           onPress={() => setAddExerciseModalVisible(!addExerciseModalVisible)} />
       ),
     });
@@ -53,57 +60,78 @@ export default function ExerciseListScreen({ navigation }) {
     }
     createExercise(addExerciseText.value).then((_) => {
       getAndSetExercises();
-      setAddExerciseText({value: '', error: ''});
+      setAddExerciseText({ value: '', error: '' });
       setAddExerciseModalVisible(false);
     }).catch((err) => {
       console.log(err.response.errors);
     });
   }
 
+  const deleteExerciseOnPress = (exercise_id) => {
+    deleteExercise(exercise_id).then((_) => {
+      getAndSetExercises();
+    }).catch((err) => {
+      console.log(err.response.errors);
+    });
+  }
+
   return (
-    <View style={{ flex: 1 }}>
+    <MenuProvider style={{ flex: 1 }}>
       <Background>
         <Logo />
         <SafeAreaView style={styles.container}>
           <FlatList
             data={exercises}
-            renderItem={({ item }) => createExerciseListElementFromJSON(item)}
+            renderItem={({ item }) => (
+              <View>
+                <Menu>
+                  <MenuTrigger>
+                    {createExerciseListElementFromJSON(item)}
+                  </MenuTrigger>
+                  <MenuOptions>
+                    <TouchableOpacity onPress={() => deleteExerciseOnPress(item.id)}>
+                      <Text>Delete</Text>
+                    </TouchableOpacity>
+                  </MenuOptions>
+                </Menu>
+              </View>
+            )}
             keyExtractor={item => item.id}
           />
         </SafeAreaView>
       </Background>
       <Modal
-        animationType="slide"
+        animationType='slide'
         transparent={true}
         visible={addExerciseModalVisible}
         onRequestClose={() => setAddExerciseModalVisible(!addExerciseModalVisible)}>
         <View style={styles.modalContainer}>
           <Text style={styles.modalTitle}>Create New Exercise</Text>
           <TextInput
-            label="Exercise Name"
-            returnKeyType="done"
+            label='Exercise Name'
+            returnKeyType='done'
             value={addExerciseText.value}
             onChangeText={(text) => setAddExerciseText({ value: text, error: '' })}
             error={!!addExerciseText.error}
             errorText={addExerciseText.error}
-            autoCapitalize="none"
+            autoCapitalize='none'
           />
-          <Button mode="contained"
+          <Button mode='contained'
             onPress={createExerciseOnPress}
           >
             Create
           </Button>
-          <Button mode="contained"
+          <Button mode='contained'
             onPress={() => {
               setAddExerciseModalVisible(false);
-              setAddExerciseText({value: '', error: ''});
+              setAddExerciseText({ value: '', error: '' });
             }}
           >
             Cancel
           </Button>
         </View>
       </Modal>
-    </View>
+    </MenuProvider>
   );
 }
 
@@ -113,14 +141,14 @@ const styles = StyleSheet.create({
     marginTop: StatusBar.currentHeight || 0,
   },
   modalContainer: {
-    top: "0px",
-    height: "75%",
-    backgroundColor: "#ffffff",
-    borderColor: "#000000",
-    borderWidth: "1px",
+    top: '0px',
+    height: '75%',
+    backgroundColor: '#ffffff',
+    borderColor: '#000000',
+    borderWidth: '1px',
   },
   modalTitle: {
     fontSize: 20,
-    textAlign: "center",
+    textAlign: 'center',
   },
 });

@@ -24,16 +24,25 @@ export const getExercises = async () => {
     }
 }
 
-export const createExercise = async (exercise_name) => {
+export const createExercise = async (name) => {
     let header = await getAuthHeader();
     try {
-        await axios.post(url = `${BASE_URL}/api/ExerciseTypes`, data = {
-            'id': 0,
-            'owner': 'owner',
-            'name': exercise_name,
+        return (await axios.post(url = `${BASE_URL}/api/ExerciseTypes`, data = {
+            'name': name,
         }, config = {
             headers: { ...header, ...JSON_HEADERS, },
-        });
+        })).data;
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const deleteExercise = async (id) => {
+    let header = await getAuthHeader();
+    try {
+        return (await axios.delete(url = `${BASE_URL}/api/ExerciseTypes/${id}`, config = {
+            headers: header,
+        })).data;
     } catch (err) {
         throw err;
     }
